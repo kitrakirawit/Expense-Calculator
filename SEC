@@ -4,83 +4,130 @@
   <meta charset="UTF-8">
   <title>Student Expense Tracker</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
       padding: 20px;
-      background-color: #f5f5f5;
     }
 
     h1 {
       text-align: center;
       color: #333;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+      color: #444;
     }
 
     input, select, button {
       padding: 10px;
       margin: 8px 0;
       width: 100%;
-      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
 
-    .income, .expense {
-      background-color: #fff;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .section {
+      margin-bottom: 30px;
     }
 
     ul {
-      list-style-type: none;
+      list-style: none;
       padding: 0;
     }
 
     li {
-      background-color: #e0e0e0;
-      margin: 5px 0;
+      background-color: #f8f8f8;
       padding: 10px;
-      border-radius: 5px;
+      margin: 6px 0;
+      border-left: 6px solid #4CAF50;
+      border-radius: 4px;
     }
 
-    .balance {
-      font-weight: bold;
-      font-size: 1.2em;
-      text-align: center;
-      margin-top: 20px;
+    .summary {
+      background-color: #e9f5f0;
+      padding: 20px;
+      border-radius: 10px;
     }
+
+    .summary div {
+      margin: 10px 0;
+      font-size: 1.1em;
+    }
+
+    .summary .positive {
+      color: green;
+    }
+
+    .summary .negative {
+      color: red;
+    }
+
   </style>
 </head>
 <body>
 
-  <h1>Student Expense Tracker</h1>
+  <div class="container">
+    <h1>Student Expense Tracker</h1>
 
-  <div class="income">
-    <h2>Add Income</h2>
-    <input id="incomeSource" placeholder="Source (e.g. Part-time job)">
-    <input id="incomeAmount" type="number" placeholder="Amount">
-    <button onclick="addIncome()">Add Income</button>
-    <ul id="incomeList"></ul>
-  </div>
+    <div class="section">
+      <h2>Add Income</h2>
+      <input id="incomeSource" placeholder="Income Source (e.g. Part-time job)">
+      <input id="incomeAmount" type="number" placeholder="Amount">
+      <button onclick="addIncome()">Add Income</button>
+      <ul id="incomeList"></ul>
+    </div>
 
-  <div class="expense">
-    <h2>Add Expense</h2>
-    <input id="expenseName" placeholder="Expense (e.g. Rent)">
-    <input id="expenseAmount" type="number" placeholder="Amount">
-    <select id="expenseCategory">
-      <option value="Food">Food</option>
-      <option value="Rent">Rent</option>
-      <option value="School">School</option>
-      <option value="Transport">Transport</option>
-      <option value="Other">Other</option>
-    </select>
-    <button onclick="addExpense()">Add Expense</button>
-    <ul id="expenseList"></ul>
-  </div>
+    <div class="section">
+      <h2>Add Expense</h2>
+      <input id="expenseName" placeholder="Expense Name (e.g. Rent)">
+      <input id="expenseAmount" type="number" placeholder="Amount">
+      <select id="expenseCategory">
+        <option value="Food">Food</option>
+        <option value="Rent">Rent</option>
+        <option value="School">School</option>
+        <option value="Transport">Transport</option>
+        <option value="Other">Other</option>
+      </select>
+      <button onclick="addExpense()">Add Expense</button>
+      <ul id="expenseList"></ul>
+    </div>
 
-  <div class="balance" id="balanceDisplay">
-    Total Balance: $0
+    <div class="section summary">
+      <h2>Summary</h2>
+      <div>Total Income: <span class="positive" id="summaryIncome">$0.00</span></div>
+      <div>Total Expenses: <span class="negative" id="summaryExpense">$0.00</span></div>
+      <div>Net Balance: <strong id="summaryBalance">$0.00</strong></div>
+    </div>
   </div>
 
   <script>
@@ -88,40 +135,44 @@
     let totalExpense = 0;
 
     function addIncome() {
-      const source = document.getElementById("incomeSource").value;
+      const source = document.getElementById("incomeSource").value.trim();
       const amount = parseFloat(document.getElementById("incomeAmount").value);
+
       if (source && amount > 0) {
         const listItem = document.createElement("li");
-        listItem.textContent = `${source}: +$${amount}`;
+        listItem.textContent = `${source}: +$${amount.toFixed(2)}`;
         document.getElementById("incomeList").appendChild(listItem);
         totalIncome += amount;
-        updateBalance();
+        updateSummary();
         document.getElementById("incomeSource").value = "";
         document.getElementById("incomeAmount").value = "";
       }
     }
 
     function addExpense() {
-      const name = document.getElementById("expenseName").value;
+      const name = document.getElementById("expenseName").value.trim();
       const amount = parseFloat(document.getElementById("expenseAmount").value);
       const category = document.getElementById("expenseCategory").value;
+
       if (name && amount > 0) {
         const listItem = document.createElement("li");
-        listItem.textContent = `${name} (${category}): -$${amount}`;
+        listItem.textContent = `${name} (${category}): -$${amount.toFixed(2)}`;
         document.getElementById("expenseList").appendChild(listItem);
         totalExpense += amount;
-        updateBalance();
+        updateSummary();
         document.getElementById("expenseName").value = "";
         document.getElementById("expenseAmount").value = "";
       }
     }
 
-    function updateBalance() {
+    function updateSummary() {
       const balance = totalIncome - totalExpense;
-      const display = document.getElementById("balanceDisplay");
-      display.textContent = `Total Balance: $${balance.toFixed(2)}`;
+      document.getElementById("summaryIncome").textContent = `$${totalIncome.toFixed(2)}`;
+      document.getElementById("summaryExpense").textContent = `$${totalExpense.toFixed(2)}`;
+      document.getElementById("summaryBalance").textContent = `$${balance.toFixed(2)}`;
     }
   </script>
 
 </body>
 </html>
+
